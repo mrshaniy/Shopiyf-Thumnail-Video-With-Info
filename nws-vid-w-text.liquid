@@ -1,0 +1,192 @@
+{{ 'nws-vid-w-text.css' | asset_url | stylesheet_tag }}
+{% style %}
+  .nws-vid-w-text {
+    {% if section.settings.slct-bg == 'gradient' %}background:{{ section.settings.section_background_gradient }};{% endif %}
+    {% if section.settings.slct-bg == 'solid' %}background:{{ section.settings.section-background }};{% endif %}
+    {% if section.settings.slct-bg == 'image' %}background-image:url({{ section.settings.bg_img | img_url: 'master'}});
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center; {% endif %}
+  }
+{% endstyle %}
+<!-- nws-vid-w-text.liquid -->
+<div class="nws-vid-w-text nws-same-padding{% if section.settings.section-extra-class != blank %}{{ section.settings.section-extra-class }}{% endif %}">
+  <div class="nws-custom-container">
+    {% if section.settings['section-heading'] != blank %}
+      <h2 class="nws-section-heading">{{ section.settings['section-heading'] }}</h2>
+    {% endif %}
+    {% if section.settings.section_desc != blank %}
+      <div class="nws-section-desc">{{ section.settings.section_desc }}</div>
+    {% endif %}
+    <div class="nws-custom-row">
+      {% for block in section.blocks %}
+        <div class="nws-inner-row">
+          <div class="nws-col-w nws-media-col">
+            {% if block.settings.thum_img != blank %}
+              <div class="video" data-behaviour="video">
+                <div class="nws-video-poster">
+                  <picture>
+                    <source>
+                    <img
+                      src="{{ block.settings.thum_img | img_url: "master" }}"
+                      width="auto"
+                      height="auto"
+                      class="nws-thum-img"
+                    >
+                  </picture>
+                  <span class="nws-video-icon">
+                    <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17.5 9.63398C18.1667 10.0189 18.1667 10.9811 17.5 11.366L1.75 20.4593C1.08333 20.8442 0.250001 20.3631 0.250001 19.5933L0.250002 1.40673C0.250002 0.636933 1.08334 0.155807 1.75 0.540708L17.5 9.63398Z" fill="white"></path>
+                    </svg>
+                  </span>
+                </div>
+                <div class="nws-video-container">
+                  <div class="nws-video-wrapper">
+                    <iframe
+                      src="//www.youtube.com/embed/{{ block.settings.video_url.id }}"
+                      allowfullscreen=""
+                      class="nws-video-iframe"
+                      frameborder="0"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="nws-col-w nws-media-info">
+            {% if block.settings.blck_heading != blank %}
+              <h2 class="nws-block-heading">{{ block.settings.blck_heading }}</h2>
+            {% endif %}
+            {% if block.settings.blck_content != blank %}
+              <div class="nws-block-content">{{ block.settings.blck_content }}</div>
+            {% endif %}
+            {% if block.settings.btn_lbl != blank %}
+              <div class="nws-btn-wrapper">
+                <a href="{{ block.settings.btn_url }}" class="nws-block-btn">{{ block.settings.btn_lbl }}</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+    class Video {
+    constructor(el) {
+      this.element = $(el)
+      this.element.on('click', this.loadVideo);
+    }
+    loadVideo = () => {
+      console.log(this.element)
+      if (this.element.find("iframe").length) {
+          var symbol = this.element.find("iframe")[0].src.indexOf("?") > -1 ? "&" : "?";
+          this.element.find("iframe")[0].src += symbol + "autoplay=1&mute=1&controls=0&showinfo=0&rel=0";
+        } else {
+          this.element.find("video")[0].play();
+        }
+        this.element.find(".nws-video-poster").addClass("nws-video-poster-hide");
+    }
+  }
+
+  $('[data-behaviour="video"]').map((i, el) => new Video(el))
+</script>
+{% schema %}
+{
+  "name": "Nws Video With Text",
+  "disabled_on": {
+  "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "options": [
+        { "value": "gradient", "label": "Gradient" },
+        { "value": "solid", "label": "Background Solid Color"},
+        { "value": "image", "label": "Background Image"}
+        ],
+      "id": "slct-bg",
+      "default": "solid",
+      "label": "Section Background Type"
+    },
+    {
+      "type": "color_background",
+      "label": "Section Background Gradient",
+      "id": "section_background_gradient"
+    },
+    {
+      "type": "color",
+      "id": "section-background",
+      "info": "Background",
+      "label": "Section Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_img",
+      "info": "Background Image",
+      "label": "BG Image"
+    },
+     {
+      "type": "text",
+      "id": "section-extra-class",
+      "info": "Add section class (without.). Use spaces to add multiple classes",
+      "label": "Section Class"
+    },
+    {
+      "type": "text",
+      "id": "section-heading",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "section_desc",
+      "label": "Description"
+    }
+  ],
+"blocks":[
+  {
+    "type": "gallery",
+    "name": "Row",
+    "settings":[
+      {
+        "type": "image_picker",
+        "id": "thum_img",
+        "label": "Thumnail Image"
+      },
+      {
+        "type": "video_url",
+        "id": "video_url",
+        "accept": ["youtube", "vimeo"],
+        "label": "Video Url"
+      },
+      {
+        "type": "text",
+        "id": "blck_heading",
+        "label": "Heading"
+      },
+      {
+        "type": "richtext",
+        "id": "blck_content",
+        "label": "Content"
+      },
+      {
+        "type": "text",
+        "id": "btn_lbl",
+        "label": "Button Label"
+      },
+      {
+        "type": "url",
+        "id": "btn_url",
+        "label": "Paste Url"
+      }
+    ]
+  }
+],
+  "presets": [
+    {
+      "name": "Nws Video With Text",
+      "category": "Nws Custom Section"
+    }
+  ]
+}
+{% endschema %}
